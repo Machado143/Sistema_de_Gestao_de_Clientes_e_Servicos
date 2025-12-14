@@ -204,6 +204,9 @@
             {% endfor %}
         </tbody>
     </table>
+    
+    {% include 'core/pagination.html' with page_obj=ordens %}
+    
 {% else %}
     <div class="empty-state">
         <h3>Nenhuma ordem de serviço encontrada</h3>

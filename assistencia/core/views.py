@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import HttpResponse
 from django.db.models import Q
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import OrdemServico, Cliente, Servico, Status
 from .forms import OrdemServicoForm, ClienteForm, ServicoForm, StatusForm
 import csv
@@ -29,10 +30,22 @@ def lista_ordens(request):
         ordens = ordens.filter(status_id=status_filtro)
     
     ordens = ordens.order_by('-data_abertura')
+    
+    # Paginação
+    paginator = Paginator(ordens, 10)  # 10 ordens por página
+    page = request.GET.get('page')
+    
+    try:
+        ordens_paginadas = paginator.page(page)
+    except PageNotAnInteger:
+        ordens_paginadas = paginator.page(1)
+    except EmptyPage:
+        ordens_paginadas = paginator.page(paginator.num_pages)
+    
     status_lista = Status.objects.all()
     
     return render(request, 'core/lista_ordens.html', {
-        'ordens': ordens,
+        'ordens': ordens_paginadas,
         'status_lista': status_lista
     })
 
@@ -118,7 +131,19 @@ def lista_clientes(request):
     busca = request.GET.get('busca')
     if busca:
         clientes = clientes.filter(Q(nome__icontains=busca) | Q(email__icontains=busca))
-    return render(request, 'core/lista_clientes.html', {'clientes': clientes})
+    
+    # Paginação
+    paginator = Paginator(clientes, 12)  # 12 clientes por página
+    page = request.GET.get('page')
+    
+    try:
+        clientes_paginados = paginator.page(page)
+    except PageNotAnInteger:
+        clientes_paginados = paginator.page(1)
+    except EmptyPage:
+        clientes_paginados = paginator.page(paginator.num_pages)
+    
+    return render(request, 'core/lista_clientes.html', {'clientes': clientes_paginados})
 
 
 @login_required
@@ -170,7 +195,19 @@ def lista_servicos(request):
     busca = request.GET.get('busca')
     if busca:
         servicos = servicos.filter(nome__icontains=busca)
-    return render(request, 'core/lista_servicos.html', {'servicos': servicos})
+    
+    # Paginação
+    paginator = Paginator(servicos, 12)  # 12 serviços por página
+    page = request.GET.get('page')
+    
+    try:
+        servicos_paginados = paginator.page(page)
+    except PageNotAnInteger:
+        servicos_paginados = paginator.page(1)
+    except EmptyPage:
+        servicos_paginados = paginator.page(paginator.num_pages)
+    
+    return render(request, 'core/lista_servicos.html', {'servicos': servicos_paginados})
 
 
 @login_required
@@ -219,7 +256,19 @@ def excluir_servico(request, pk):
 @login_required
 def lista_status(request):
     status_lista = Status.objects.all().order_by('nome')
-    return render(request, 'core/lista_status.html', {'status_lista': status_lista})
+    
+    # Paginação
+    paginator = Paginator(status_lista, 12)
+    page = request.GET.get('page')
+    
+    try:
+        status_paginados = paginator.page(page)
+    except PageNotAnInteger:
+        status_paginados = paginator.page(1)
+    except EmptyPage:
+        status_paginados = paginator.page(paginator.num_pages)
+    
+    return render(request, 'core/lista_status.html', {'status_lista': status_paginados})
 
 
 @login_required

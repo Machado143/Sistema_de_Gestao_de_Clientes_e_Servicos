@@ -98,6 +98,9 @@
         </div>
         {% endfor %}
     </div>
+
+    {% include 'core/pagination.html' with page_obj=status_lista %}
+
 {% else %}
     <div class="empty-state">
         <h3>Nenhum status cadastrado</h3>
