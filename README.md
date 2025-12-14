@@ -101,11 +101,6 @@ O dashboard exibe:
 - Ordens recentes e pendentes.
 - Top 5 clientes e serviços mais utilizados.
 
-## 📸 Screenshots
-*(Adicione imagens aqui no GitHub)*
-- Dashboard: Visão geral com cards e gráficos.
-- Lista de Ordens: Tabela paginada com filtros.
-- Formulário de Ordem: Campos validados e widgets personalizados.
 
 ## 🤝 Contribuição
 
@@ -122,14 +117,3 @@ Contribuições são bem-vindas! Siga estes passos:
 - Use nomes descritivos em inglês/português consistente.
 - Adicione testes unitários para novas features.
 
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
-## 📞 Contato
-
-- **Autor**: [Seu Nome]
-- **Email**: seu-email@example.com
-- **GitHub**: [seu-usuario](https://github.com/seu-usuario)
-
-Obrigado por usar o Sistema de Gestão de Clientes e Serviços! 🚀
