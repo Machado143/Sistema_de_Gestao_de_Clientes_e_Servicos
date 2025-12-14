@@ -20,6 +20,40 @@
         gap: 1rem;
     }
     
+    .filter-section {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .filter-form {
+        display: flex;
+        gap: 1rem;
+        align-items: end;
+    }
+    
+    .filter-group {
+        flex: 1;
+    }
+    
+    .filter-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .filter-group input,
+    .filter-group select {
+        width: 100%;
+        padding: 0.7rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+    }
+    
     table {
         width: 100%;
         background: white;
@@ -61,14 +95,19 @@
         color: #856404;
     }
     
-    .status-andamento {
+    .status-em {
         background: #cce5ff;
         color: #004085;
     }
     
-    .status-concluida {
+    .status-concluída {
         background: #d4edda;
         color: #155724;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
     }
     
     .empty-state {
@@ -91,8 +130,29 @@
     <h2>📋 Ordens de Serviço</h2>
     <div class="actions">
         <a href="{% url 'criar_ordem' %}" class="btn btn-success">+ Nova Ordem</a>
-        <a href="{% url 'exportar_csv' %}" class="btn btn-secondary">📥 Exportar CSV</a>
     </div>
+</div>
+
+<div class="filter-section">
+    <form method="get" class="filter-form">
+        <div class="filter-group">
+            <label for="busca">🔍 Buscar</label>
+            <input type="text" id="busca" name="busca" placeholder="Cliente, ID ou problema..." value="{{ request.GET.busca }}">
+        </div>
+        <div class="filter-group">
+            <label for="status">Filtrar por Status</label>
+            <select id="status" name="status">
+                <option value="">Todos</option>
+                {% for s in status_lista %}
+                    <option value="{{ s.id }}" {% if request.GET.status == s.id|stringformat:"s" %}selected{% endif %}>
+                        {{ s.nome }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn">Filtrar</button>
+        <a href="{% url 'lista_ordens' %}" class="btn btn-secondary">Limpar</a>
+    </form>
 </div>
 
 {% if ordens %}
@@ -105,6 +165,7 @@
                 <th>Status</th>
                 <th>Data Abertura</th>
                 <th>Data Conclusão</th>
+                <th>Ações</th>
             </tr>
         </thead>
         <tbody>
@@ -120,7 +181,7 @@
                     <small style="color: #27ae60; font-weight: 600;">R$ {{ ordem.servico.preco }}</small>
                 </td>
                 <td>
-                    <span class="status-badge status-{{ ordem.status.nome|lower }}">
+                    <span class="status-badge status-{{ ordem.status.nome|lower|slice:':3' }}">
                         {{ ordem.status.nome }}
                     </span>
                 </td>
@@ -132,14 +193,27 @@
                         <span style="color: #95a5a6;">—</span>
                     {% endif %}
                 </td>
+                <td>
+                    <div class="action-buttons">
+                        <a href="{% url 'detalhe_ordem' ordem.pk %}" class="btn btn-small" title="Ver detalhes">👁️</a>
+                        <a href="{% url 'editar_ordem' ordem.pk %}" class="btn btn-small" title="Editar">✏️</a>
+                        <a href="{% url 'excluir_ordem' ordem.pk %}" class="btn btn-danger btn-small" title="Excluir">🗑️</a>
+                    </div>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 {% else %}
     <div class="empty-state">
-        <h3>Nenhuma ordem de serviço cadastrada</h3>
-        <p style="color: #95a5a6; margin-bottom: 1.5rem;">Comece criando sua primeira ordem de serviço</p>
+        <h3>Nenhuma ordem de serviço encontrada</h3>
+        <p style="color: #95a5a6; margin-bottom: 1.5rem;">
+            {% if request.GET.busca or request.GET.status %}
+                Tente ajustar os filtros ou limpar a busca
+            {% else %}
+                Comece criando sua primeira ordem de serviço
+            {% endif %}
+        </p>
         <a href="{% url 'criar_ordem' %}" class="btn btn-success">+ Criar Primeira Ordem</a>
     </div>
 {% endif %}

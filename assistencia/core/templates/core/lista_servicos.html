@@ -1,0 +1,154 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Serviços{% endblock %}
+
+{% block extra_css %}
+<style>
+    .header-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .header-section h2 {
+        color: #2c3e50;
+    }
+    
+    .search-section {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .search-form {
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .search-form input {
+        flex: 1;
+        padding: 0.7rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+    }
+    
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .servico-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .servico-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .servico-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 1rem;
+    }
+    
+    .servico-card h3 {
+        color: #2c3e50;
+        font-size: 1.3rem;
+        margin: 0;
+    }
+    
+    .servico-preco {
+        background: #27ae60;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    
+    .servico-descricao {
+        color: #7f8c8d;
+        margin-bottom: 1rem;
+        flex-grow: 1;
+        line-height: 1.5;
+    }
+    
+    .card-actions {
+        display: flex;
+        gap: 0.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid #ecf0f1;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .empty-state h3 {
+        color: #7f8c8d;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="header-section">
+    <h2>🛠️ Serviços</h2>
+    <a href="{% url 'criar_servico' %}" class="btn btn-success">+ Novo Serviço</a>
+</div>
+
+<div class="search-section">
+    <form method="get" class="search-form">
+        <input type="text" name="busca" placeholder="🔍 Buscar serviço..." value="{{ request.GET.busca }}">
+        <button type="submit" class="btn">Buscar</button>
+        <a href="{% url 'lista_servicos' %}" class="btn btn-secondary">Limpar</a>
+    </form>
+</div>
+
+{% if servicos %}
+    <div class="cards-grid">
+        {% for servico in servicos %}
+        <div class="servico-card">
+            <div class="servico-header">
+                <h3>{{ servico.nome }}</h3>
+                <span class="servico-preco">R$ {{ servico.preco }}</span>
+            </div>
+            <p class="servico-descricao">{{ servico.descricao }}</p>
+            <div class="card-actions">
+                <a href="{% url 'editar_servico' servico.pk %}" class="btn btn-small">✏️ Editar</a>
+                <a href="{% url 'excluir_servico' servico.pk %}" class="btn btn-danger btn-small">🗑️ Excluir</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <h3>Nenhum serviço encontrado</h3>
+        <p style="color: #95a5a6; margin-bottom: 1.5rem;">
+            {% if request.GET.busca %}
+                Tente ajustar a busca
+            {% else %}
+                Comece cadastrando seu primeiro serviço
+            {% endif %}
+        </p>
+        <a href="{% url 'criar_servico' %}" class="btn btn-success">+ Cadastrar Primeiro Serviço</a>
+    </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,188 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Ordem #{{ ordem.id }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .detail-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    .detail-header {
+        background: #34495e;
+        color: white;
+        padding: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .detail-header h2 {
+        margin: 0;
+    }
+    
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+    
+    .status-pendente {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-em {
+        background: #cce5ff;
+        color: #004085;
+    }
+    
+    .status-concluída {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .detail-body {
+        padding: 2rem;
+    }
+    
+    .detail-section {
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid #ecf0f1;
+    }
+    
+    .detail-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+    
+    .detail-section h3 {
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+    }
+    
+    .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+    
+    .detail-item {
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 4px;
+    }
+    
+    .detail-item label {
+        display: block;
+        font-size: 0.85rem;
+        color: #7f8c8d;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+    
+    .detail-item p {
+        margin: 0;
+        color: #2c3e50;
+        font-size: 1.1rem;
+    }
+    
+    .detail-full {
+        grid-column: 1 / -1;
+    }
+    
+    .detail-actions {
+        display: flex;
+        gap: 1rem;
+        padding: 1.5rem 2rem;
+        background: #f8f9fa;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+    <div class="detail-header">
+        <h2>📋 Ordem de Serviço #{{ ordem.id }}</h2>
+        <span class="status-badge status-{{ ordem.status.nome|lower|slice:':3' }}">
+            {{ ordem.status.nome }}
+        </span>
+    </div>
+    
+    <div class="detail-body">
+        <div class="detail-section">
+            <h3>👤 Informações do Cliente</h3>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <label>Nome</label>
+                    <p>{{ ordem.cliente.nome }}</p>
+                </div>
+                <div class="detail-item">
+                    <label>Email</label>
+                    <p>{{ ordem.cliente.email }}</p>
+                </div>
+                <div class="detail-item">
+                    <label>Telefone</label>
+                    <p>{{ ordem.cliente.telefone }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="detail-section">
+            <h3>🛠️ Serviço</h3>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <label>Nome do Serviço</label>
+                    <p>{{ ordem.servico.nome }}</p>
+                </div>
+                <div class="detail-item">
+                    <label>Preço</label>
+                    <p style="color: #27ae60; font-weight: 600;">R$ {{ ordem.servico.preco }}</p>
+                </div>
+                <div class="detail-item detail-full">
+                    <label>Descrição do Serviço</label>
+                    <p>{{ ordem.servico.descricao }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="detail-section">
+            <h3>📝 Detalhes da Ordem</h3>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <label>Data de Abertura</label>
+                    <p>{{ ordem.data_abertura|date:"d/m/Y" }}</p>
+                </div>
+                <div class="detail-item">
+                    <label>Data de Conclusão</label>
+                    <p>
+                        {% if ordem.data_conclusao %}
+                            {{ ordem.data_conclusao|date:"d/m/Y" }}
+                        {% else %}
+                            <span style="color: #95a5a6;">Não concluída</span>
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="detail-item detail-full">
+                    <label>Descrição do Problema</label>
+                    <p>{{ ordem.descricao_problema }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="detail-actions">
+        <a href="{% url 'editar_ordem' ordem.pk %}" class="btn btn-success">✏️ Editar</a>
+        <a href="{% url 'excluir_ordem' ordem.pk %}" class="btn btn-danger">🗑️ Excluir</a>
+        <a href="{% url 'lista_ordens' %}" class="btn btn-secondary">← Voltar</a>
+    </div>
+</div>
+{% endblock %}

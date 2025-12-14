@@ -29,16 +29,31 @@
             margin-bottom: 0.5rem;
         }
         
+        .navbar nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
         .navbar nav a {
             color: #ecf0f1;
             text-decoration: none;
-            margin-right: 1.5rem;
             font-weight: 500;
             transition: color 0.3s;
+            padding: 0.5rem;
         }
         
         .navbar nav a:hover {
             color: #3498db;
+        }
+        
+        .user-info {
+            color: #ecf0f1;
         }
         
         .container {
@@ -80,6 +95,23 @@
             background: #7f8c8d;
         }
         
+        .btn-danger {
+            background: #e74c3c;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        
+        .btn-small {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.9rem;
+        }
+        
+        .messages {
+            margin-bottom: 1rem;
+        }
+        
         .alert {
             padding: 1rem;
             margin-bottom: 1rem;
@@ -94,6 +126,18 @@
             border-color: #f5c6cb;
             color: #721c24;
         }
+        
+        .alert-warning {
+            background: #fff3cd;
+            border-color: #ffeeba;
+            color: #856404;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            border-color: #bee5eb;
+            color: #0c5460;
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -101,17 +145,32 @@
     <div class="navbar">
         <h1>🔧 Sistema de Assistência Técnica</h1>
         <nav>
-            <a href="{% url 'lista_ordens' %}">Ordens de Serviço</a>
-            <a href="{% url 'criar_ordem' %}">Nova Ordem</a>
-            <a href="{% url 'exportar_csv' %}">Exportar CSV</a>
-            <a href="/admin/">Admin</a>
+            <div class="nav-links">
+                <a href="{% url 'lista_ordens' %}">📋 Ordens</a>
+                <a href="{% url 'lista_clientes' %}">👥 Clientes</a>
+                <a href="{% url 'lista_servicos' %}">🛠️ Serviços</a>
+                <a href="{% url 'lista_status' %}">📊 Status</a>
+                <a href="{% url 'exportar_csv' %}">📥 Exportar</a>
+            </div>
             {% if user.is_authenticated %}
-                <span style="float: right;">Olá, {{ user.username }} | <a href="/admin/logout/">Sair</a></span>
+                <div class="user-info">
+                    Olá, {{ user.username }} | <a href="/admin/logout/">Sair</a>
+                </div>
             {% endif %}
         </nav>
     </div>
     
     <div class="container">
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
         {% block content %}{% endblock %}
     </div>
 </body>

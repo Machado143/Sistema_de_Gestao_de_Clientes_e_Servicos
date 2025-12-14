@@ -1,0 +1,144 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Clientes{% endblock %}
+
+{% block extra_css %}
+<style>
+    .header-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .header-section h2 {
+        color: #2c3e50;
+    }
+    
+    .search-section {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .search-form {
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .search-form input {
+        flex: 1;
+        padding: 0.7rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+    }
+    
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .cliente-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .cliente-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .cliente-card h3 {
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        font-size: 1.3rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .cliente-info {
+        margin-bottom: 1rem;
+        color: #7f8c8d;
+    }
+    
+    .cliente-info p {
+        margin: 0.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .card-actions {
+        display: flex;
+        gap: 0.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid #ecf0f1;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .empty-state h3 {
+        color: #7f8c8d;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="header-section">
+    <h2>👥 Clientes</h2>
+    <a href="{% url 'criar_cliente' %}" class="btn btn-success">+ Novo Cliente</a>
+</div>
+
+<div class="search-section">
+    <form method="get" class="search-form">
+        <input type="text" name="busca" placeholder="🔍 Buscar por nome ou email..." value="{{ request.GET.busca }}">
+        <button type="submit" class="btn">Buscar</button>
+        <a href="{% url 'lista_clientes' %}" class="btn btn-secondary">Limpar</a>
+    </form>
+</div>
+
+{% if clientes %}
+    <div class="cards-grid">
+        {% for cliente in clientes %}
+        <div class="cliente-card">
+            <h3>👤 {{ cliente.nome }}</h3>
+            <div class="cliente-info">
+                <p>📧 {{ cliente.email }}</p>
+                <p>📱 {{ cliente.telefone }}</p>
+            </div>
+            <div class="card-actions">
+                <a href="{% url 'editar_cliente' cliente.pk %}" class="btn btn-small">✏️ Editar</a>
+                <a href="{% url 'excluir_cliente' cliente.pk %}" class="btn btn-danger btn-small">🗑️ Excluir</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <h3>Nenhum cliente encontrado</h3>
+        <p style="color: #95a5a6; margin-bottom: 1.5rem;">
+            {% if request.GET.busca %}
+                Tente ajustar a busca
+            {% else %}
+                Comece cadastrando seu primeiro cliente
+            {% endif %}
+        </p>
+        <a href="{% url 'criar_cliente' %}" class="btn btn-success">+ Cadastrar Primeiro Cliente</a>
+    </div>
+{% endif %}
+{% endblock %}

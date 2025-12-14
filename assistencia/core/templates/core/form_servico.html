@@ -1,11 +1,11 @@
 {% extends 'core/base.html' %}
 
-{% block title %}{{ acao }} Ordem de Serviço{% endblock %}
+{% block title %}{{ acao }} Serviço{% endblock %}
 
 {% block extra_css %}
 <style>
     .form-container {
-        max-width: 700px;
+        max-width: 600px;
         margin: 0 auto;
         background: white;
         padding: 2rem;
@@ -32,7 +32,6 @@
     }
     
     .form-group input,
-    .form-group select,
     .form-group textarea {
         width: 100%;
         padding: 0.8rem;
@@ -43,12 +42,10 @@
     }
     
     .form-group textarea {
-        min-height: 100px;
         resize: vertical;
     }
     
     .form-group input:focus,
-    .form-group select:focus,
     .form-group textarea:focus {
         outline: none;
         border-color: #3498db;
@@ -75,7 +72,6 @@
     }
     
     .form-group.error input,
-    .form-group.error select,
     .form-group.error textarea {
         border-color: #e74c3c;
     }
@@ -84,7 +80,7 @@
 
 {% block content %}
 <div class="form-container">
-    <h2>📝 {{ acao }} Ordem de Serviço</h2>
+    <h2>🛠️ {{ acao }} Serviço</h2>
     
     <form method="post">
         {% csrf_token %}
@@ -110,8 +106,8 @@
         {% endfor %}
         
         <div class="form-actions">
-            <button type="submit" class="btn btn-success">✓ Salvar Ordem</button>
-            <a href="{% url 'lista_ordens' %}" class="btn btn-secondary">✕ Cancelar</a>
+            <button type="submit" class="btn btn-success">✓ Salvar Serviço</button>
+            <a href="{% url 'lista_servicos' %}" class="btn btn-secondary">✕ Cancelar</a>
         </div>
     </form>
 </div>

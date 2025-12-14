@@ -1,0 +1,72 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Confirmar Exclusão{% endblock %}
+
+{% block extra_css %}
+<style>
+    .confirm-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    
+    .confirm-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+    
+    .confirm-container h2 {
+        color: #e74c3c;
+        margin-bottom: 1rem;
+    }
+    
+    .confirm-container p {
+        color: #7f8c8d;
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+    }
+    
+    .objeto-info {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 4px;
+        margin-bottom: 2rem;
+        border-left: 4px solid #e74c3c;
+    }
+    
+    .objeto-info strong {
+        color: #2c3e50;
+        font-size: 1.2rem;
+    }
+    
+    .confirm-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="confirm-container">
+    <div class="confirm-icon">⚠️</div>
+    <h2>Confirmar Exclusão</h2>
+    <p>Tem certeza que deseja excluir este(a) {{ tipo }}?</p>
+    
+    <div class="objeto-info">
+        <strong>{{ objeto }}</strong>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div class="confirm-actions">
+            <button type="submit" class="btn btn-danger">🗑️ Sim, Excluir</button>
+            <a href="{% url url_cancelar %}" class="btn btn-secondary">✕ Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
