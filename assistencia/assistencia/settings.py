@@ -103,14 +103,6 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
-USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
@@ -121,3 +113,8 @@ LOGIN_URL = '/admin/login/'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LANGUAGE_CODE = 'pt-br'  # Definindo o idioma para português do Brasil
+TIME_ZONE = 'America/Sao_Paulo'  # Definindo o fuso horário para São Paulo
+USE_I18N = True
+USE_TZ = True

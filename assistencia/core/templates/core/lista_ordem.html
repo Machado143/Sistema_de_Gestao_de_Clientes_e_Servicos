@@ -1,0 +1,146 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Ordens de Serviço{% endblock %}
+
+{% block extra_css %}
+<style>
+    .header-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .header-section h2 {
+        color: #2c3e50;
+    }
+    
+    .actions {
+        display: flex;
+        gap: 1rem;
+    }
+    
+    table {
+        width: 100%;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border-collapse: collapse;
+    }
+    
+    thead {
+        background: #34495e;
+        color: white;
+    }
+    
+    th, td {
+        padding: 1rem;
+        text-align: left;
+    }
+    
+    tbody tr {
+        border-bottom: 1px solid #ecf0f1;
+        transition: background 0.2s;
+    }
+    
+    tbody tr:hover {
+        background: #f8f9fa;
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 0.3rem 0.8rem;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .status-pendente {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-andamento {
+        background: #cce5ff;
+        color: #004085;
+    }
+    
+    .status-concluida {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .empty-state h3 {
+        color: #7f8c8d;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="header-section">
+    <h2>📋 Ordens de Serviço</h2>
+    <div class="actions">
+        <a href="{% url 'criar_ordem' %}" class="btn btn-success">+ Nova Ordem</a>
+        <a href="{% url 'exportar_csv' %}" class="btn btn-secondary">📥 Exportar CSV</a>
+    </div>
+</div>
+
+{% if ordens %}
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Cliente</th>
+                <th>Serviço</th>
+                <th>Status</th>
+                <th>Data Abertura</th>
+                <th>Data Conclusão</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ordem in ordens %}
+            <tr>
+                <td><strong>{{ ordem.id }}</strong></td>
+                <td>
+                    {{ ordem.cliente.nome }}<br>
+                    <small style="color: #7f8c8d;">{{ ordem.cliente.email }}</small>
+                </td>
+                <td>
+                    {{ ordem.servico.nome }}<br>
+                    <small style="color: #27ae60; font-weight: 600;">R$ {{ ordem.servico.preco }}</small>
+                </td>
+                <td>
+                    <span class="status-badge status-{{ ordem.status.nome|lower }}">
+                        {{ ordem.status.nome }}
+                    </span>
+                </td>
+                <td>{{ ordem.data_abertura|date:"d/m/Y" }}</td>
+                <td>
+                    {% if ordem.data_conclusao %}
+                        {{ ordem.data_conclusao|date:"d/m/Y" }}
+                    {% else %}
+                        <span style="color: #95a5a6;">—</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="empty-state">
+        <h3>Nenhuma ordem de serviço cadastrada</h3>
+        <p style="color: #95a5a6; margin-bottom: 1.5rem;">Comece criando sua primeira ordem de serviço</p>
+        <a href="{% url 'criar_ordem' %}" class="btn btn-success">+ Criar Primeira Ordem</a>
+    </div>
+{% endif %}
+{% endblock %}
