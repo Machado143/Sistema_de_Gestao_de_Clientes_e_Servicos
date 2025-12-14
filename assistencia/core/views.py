@@ -7,7 +7,10 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import OrdemServico, Cliente, Servico, Status
 from .forms import OrdemServicoForm, ClienteForm, ServicoForm, StatusForm
 import csv
-
+from django.db.models import Count, Sum 
+from django.db.models.functions import TruncMonth
+from datetime import datetime, timedelta
+import json
 
 # ========== ORDENS DE SERVIÇO ==========
 
@@ -310,3 +313,107 @@ def excluir_status(request, pk):
         'tipo': 'Status',
         'url_cancelar': 'lista_status'
     })
+@login_required
+def dashboard(request):
+    # Totais gerais
+    total_ordens = OrdemServico.objects.count()
+    total_clientes = Cliente.objects.count()
+    total_servicos = Servico.objects.count()
+    
+    # Receita total
+    receita_total = OrdemServico.objects.aggregate(
+        total=Sum('servico__preco')
+    )['total'] or 0
+    
+    # Ordens por status
+    ordens_por_status = OrdemServico.objects.values('status__nome').annotate(
+        total=Count('id')
+    ).order_by('status__nome')
+    
+    # Ordens pendentes
+    ordens_pendentes = OrdemServico.objects.filter(
+        status__nome__icontains='Pendente'
+    ).count()
+    
+    # Ordens concluídas
+    ordens_concluidas = OrdemServico.objects.filter(
+        status__nome__icontains='Concluída'
+    ).count()
+    
+    # Ordens recentes (últimas 5)
+    ordens_recentes = OrdemServico.objects.select_related(
+        'cliente', 'servico', 'status'
+    ).order_by('-data_abertura')[:5]
+    
+    # Top 5 clientes com mais ordens
+    top_clientes = Cliente.objects.annotate(
+        total_ordens=Count('ordemservico')
+    ).filter(total_ordens__gt=0).order_by('-total_ordens')[:5]
+    
+    # Top 5 serviços mais solicitados
+    top_servicos = Servico.objects.annotate(
+        total_ordens=Count('ordemservico')
+    ).filter(total_ordens__gt=0).order_by('-total_ordens')[:5]
+    
+    # Ordens por mês (últimos 6 meses)
+    seis_meses_atras = datetime.now() - timedelta(days=180)
+    ordens_por_mes = OrdemServico.objects.filter(
+        data_abertura__gte=seis_meses_atras
+    ).annotate(
+        mes=TruncMonth('data_abertura')
+    ).values('mes').annotate(
+        total=Count('id')
+    ).order_by('mes')
+    
+    # Preparar dados para gráficos
+    meses_labels = []
+    meses_valores = []
+    for item in ordens_por_mes:
+        meses_labels.append(item['mes'].strftime('%b/%Y'))
+        meses_valores.append(item['total'])
+    
+    status_labels = []
+    status_valores = []
+    status_cores = []
+    cores_padrao = ['#f39c12', '#3498db', '#27ae60', '#e74c3c', '#9b59b6']
+    for idx, item in enumerate(ordens_por_status):
+        status_labels.append(item['status__nome'])
+        status_valores.append(item['total'])
+        status_cores.append(cores_padrao[idx % len(cores_padrao)])
+    
+    # Receita mensal (últimos 6 meses)
+    receita_por_mes = OrdemServico.objects.filter(
+        data_abertura__gte=seis_meses_atras
+    ).annotate(
+        mes=TruncMonth('data_abertura')
+    ).values('mes').annotate(
+        receita=Sum('servico__preco')
+    ).order_by('mes')
+    
+    receita_meses_labels = []
+    receita_meses_valores = []
+    for item in receita_por_mes:
+        receita_meses_labels.append(item['mes'].strftime('%b/%Y'))
+        receita_meses_valores.append(float(item['receita'] or 0))
+    
+    context = {
+        'total_ordens': total_ordens,
+        'total_clientes': total_clientes,
+        'total_servicos': total_servicos,
+        'receita_total': receita_total,
+        'ordens_pendentes': ordens_pendentes,
+        'ordens_concluidas': ordens_concluidas,
+        'ordens_recentes': ordens_recentes,
+        'top_clientes': top_clientes,
+        'top_servicos': top_servicos,
+        # Dados para gráficos
+        'meses_labels': json.dumps(meses_labels),
+        'meses_valores': json.dumps(meses_valores),
+        'status_labels': json.dumps(status_labels),
+        'status_valores': json.dumps(status_valores),
+        'status_cores': json.dumps(status_cores),
+        'receita_meses_labels': json.dumps(receita_meses_labels),
+        'receita_meses_valores': json.dumps(receita_meses_valores),
+    }
+    
+    return render(request, 'core/dashboard.html', context)

@@ -1,0 +1,479 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-header {
+        margin-bottom: 2rem;
+    }
+    
+    .dashboard-header h2 {
+        color: #2c3e50;
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .dashboard-subtitle {
+        color: #7f8c8d;
+    }
+    
+    /* Cards de Estatísticas */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .stat-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .stat-icon {
+        font-size: 2.5rem;
+        opacity: 0.8;
+    }
+    
+    .stat-title {
+        color: #7f8c8d;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+    
+    .stat-card.primary .stat-value { color: #3498db; }
+    .stat-card.success .stat-value { color: #27ae60; }
+    .stat-card.warning .stat-value { color: #f39c12; }
+    .stat-card.danger .stat-value { color: #e74c3c; }
+    
+    /* Seção de Gráficos */
+    .charts-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .chart-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .chart-card h3 {
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+        font-size: 1.3rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .chart-container {
+        position: relative;
+        height: 300px;
+    }
+    
+    /* Tabelas de Top */
+    .top-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .top-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .top-card h3 {
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+        font-size: 1.3rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .top-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 6px;
+        margin-bottom: 0.8rem;
+        transition: background 0.2s;
+    }
+    
+    .top-item:hover {
+        background: #e9ecef;
+    }
+    
+    .top-item-info {
+        flex: 1;
+    }
+    
+    .top-item-name {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.3rem;
+    }
+    
+    .top-item-detail {
+        font-size: 0.85rem;
+        color: #7f8c8d;
+    }
+    
+    .top-item-badge {
+        background: #3498db;
+        color: white;
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    /* Ordens Recentes */
+    .recent-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .recent-card h3 {
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+        font-size: 1.3rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .recent-order {
+        padding: 1rem;
+        border-left: 4px solid #3498db;
+        background: #f8f9fa;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+        transition: all 0.2s;
+    }
+    
+    .recent-order:hover {
+        background: #e9ecef;
+        transform: translateX(4px);
+    }
+    
+    .recent-order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+    
+    .recent-order-id {
+        font-weight: 700;
+        color: #2c3e50;
+    }
+    
+    .recent-order-status {
+        padding: 0.3rem 0.8rem;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .status-pen {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-em {
+        background: #cce5ff;
+        color: #004085;
+    }
+    
+    .status-con {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .recent-order-info {
+        color: #7f8c8d;
+        font-size: 0.9rem;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 2rem;
+        color: #7f8c8d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h2>📊 Dashboard</h2>
+    <p class="dashboard-subtitle">Visão geral do sistema de assistência técnica</p>
+</div>
+
+<!-- Cards de Estatísticas -->
+<div class="stats-grid">
+    <div class="stat-card primary">
+        <div class="stat-title">Total de Ordens</div>
+        <div class="stat-card-header">
+            <div class="stat-value">{{ total_ordens }}</div>
+            <div class="stat-icon">📋</div>
+        </div>
+    </div>
+    
+    <div class="stat-card success">
+        <div class="stat-title">Clientes Cadastrados</div>
+        <div class="stat-card-header">
+            <div class="stat-value">{{ total_clientes }}</div>
+            <div class="stat-icon">👥</div>
+        </div>
+    </div>
+    
+    <div class="stat-card warning">
+        <div class="stat-title">Ordens Pendentes</div>
+        <div class="stat-card-header">
+            <div class="stat-value">{{ ordens_pendentes }}</div>
+            <div class="stat-icon">⏳</div>
+        </div>
+    </div>
+    
+    <div class="stat-card danger">
+        <div class="stat-title">Receita Total</div>
+        <div class="stat-card-header">
+            <div class="stat-value">R$ {{ receita_total|floatformat:2 }}</div>
+            <div class="stat-icon">💰</div>
+        </div>
+    </div>
+</div>
+
+<!-- Gráficos -->
+<div class="charts-section">
+    <div class="chart-card">
+        <h3>📈 Ordens por Mês</h3>
+        <div class="chart-container">
+            <canvas id="ordensChart"></canvas>
+        </div>
+    </div>
+    
+    <div class="chart-card">
+        <h3>🎯 Ordens por Status</h3>
+        <div class="chart-container">
+            <canvas id="statusChart"></canvas>
+        </div>
+    </div>
+    
+    <div class="chart-card">
+        <h3>💵 Receita Mensal</h3>
+        <div class="chart-container">
+            <canvas id="receitaChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Top Clientes e Serviços -->
+<div class="top-section">
+    <div class="top-card">
+        <h3>🏆 Top 5 Clientes</h3>
+        {% if top_clientes %}
+            {% for cliente in top_clientes %}
+            <div class="top-item">
+                <div class="top-item-info">
+                    <div class="top-item-name">{{ cliente.nome }}</div>
+                    <div class="top-item-detail">{{ cliente.email }}</div>
+                </div>
+                <span class="top-item-badge">{{ cliente.total_ordens }} ordem{{ cliente.total_ordens|pluralize:"s" }}</span>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">Nenhum cliente com ordens</div>
+        {% endif %}
+    </div>
+    
+    <div class="top-card">
+        <h3>⚙️ Top 5 Serviços</h3>
+        {% if top_servicos %}
+            {% for servico in top_servicos %}
+            <div class="top-item">
+                <div class="top-item-info">
+                    <div class="top-item-name">{{ servico.nome }}</div>
+                    <div class="top-item-detail">R$ {{ servico.preco }}</div>
+                </div>
+                <span class="top-item-badge">{{ servico.total_ordens }}x</span>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">Nenhum serviço solicitado</div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Ordens Recentes -->
+<div class="recent-card">
+    <h3>🕐 Ordens Recentes</h3>
+    {% if ordens_recentes %}
+        {% for ordem in ordens_recentes %}
+        <div class="recent-order">
+            <div class="recent-order-header">
+                <span class="recent-order-id">OS #{{ ordem.id }}</span>
+                <span class="recent-order-status status-{{ ordem.status.nome|lower|slice:':3' }}">
+                    {{ ordem.status.nome }}
+                </span>
+            </div>
+            <div class="recent-order-info">
+                <strong>{{ ordem.cliente.nome }}</strong> • {{ ordem.servico.nome }} • {{ ordem.data_abertura|date:"d/m/Y" }}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">Nenhuma ordem registrada</div>
+    {% endif %}
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    // Configuração global
+    Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+    
+    // Gráfico de Ordens por Mês
+    const ordensCtx = document.getElementById('ordensChart').getContext('2d');
+    new Chart(ordensCtx, {
+        type: 'line',
+        data: {
+            labels: {{ meses_labels|safe }},
+            datasets: [{
+                label: 'Ordens',
+                data: {{ meses_valores|safe }},
+                borderColor: '#3498db',
+                backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                pointBackgroundColor: '#3498db',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+    
+    // Gráfico de Ordens por Status
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ status_labels|safe }},
+            datasets: [{
+                data: {{ status_valores|safe }},
+                backgroundColor: {{ status_cores|safe }},
+                borderWidth: 3,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 15,
+                        font: {
+                            size: 12
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    // Gráfico de Receita Mensal
+    const receitaCtx = document.getElementById('receitaChart').getContext('2d');
+    new Chart(receitaCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ receita_meses_labels|safe }},
+            datasets: [{
+                label: 'Receita (R$)',
+                data: {{ receita_meses_valores|safe }},
+                backgroundColor: '#27ae60',
+                borderColor: '#229954',
+                borderWidth: 2,
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return 'R$ ' + value.toFixed(2);
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

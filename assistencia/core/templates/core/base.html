@@ -142,24 +142,26 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <div class="navbar">
-        <h1>🔧 Sistema de Assistência Técnica</h1>
-        <nav>
-            <div class="nav-links">
-                <a href="{% url 'lista_ordens' %}">📋 Ordens</a>
-                <a href="{% url 'lista_clientes' %}">👥 Clientes</a>
-                <a href="{% url 'lista_servicos' %}">🛠️ Serviços</a>
-                <a href="{% url 'lista_status' %}">📊 Status</a>
-                <a href="{% url 'exportar_csv' %}">📥 Exportar</a>
+    <!-- Substitua a seção de navegação no base.html por esta: -->
+
+<div class="navbar">
+    <h1>🔧 Sistema de Assistência Técnica</h1>
+    <nav>
+        <div class="nav-links">
+            <a href="{% url 'dashboard' %}">📊 Dashboard</a>
+            <a href="{% url 'lista_ordens' %}">📋 Ordens</a>
+            <a href="{% url 'lista_clientes' %}">👥 Clientes</a>
+            <a href="{% url 'lista_servicos' %}">🛠️ Serviços</a>
+            <a href="{% url 'lista_status' %}">📊 Status</a>
+            <a href="{% url 'exportar_csv' %}">📥 Exportar</a>
+        </div>
+        {% if user.is_authenticated %}
+            <div class="user-info">
+                Olá, {{ user.username }} | <a href="/admin/logout/">Sair</a>
             </div>
-            {% if user.is_authenticated %}
-                <div class="user-info">
-                    Olá, {{ user.username }} | <a href="/admin/logout/">Sair</a>
-                </div>
-            {% endif %}
-        </nav>
+        {% endif %}
+    </nav>
     </div>
-    
     <div class="container">
         {% if messages %}
             <div class="messages">
